@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>PENGUMUMAN KELULUSAN SMP SWASTA ISLAM TERPADU IBNU HALIM</title>
+    <!-- CSS Bootstrap & FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Library PDF, Barcode, QRCode -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root { 
+            --primary-bg: #0f2027;
+            --secondary-bg: #203a43;
+            --tertiary-bg: #2c5364;
+        }
+        body { 
+            background-color: #f0f4f8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header Web */
+        .hero { 
+            background: linear-gradient(to right, var(--primary-bg), var(--secondary-bg), var(--tertiary-bg)); 
+            color: white; 
+            padding: 20px 0; 
+            border-bottom: 4px solid #ffc107; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        .logo-placeholder {
+            width: 50px; height: 50px; background: rgba(255,255,255,0.1);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin-right: 15px; border: 2px solid #ffc107;
+        }
+
+        /* Kartu Status UI */
+        .status-card {
+            border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            background: white; border: none;
+        }
+        .status-badge {
+            border: 3px solid #ccc; padding: 15px; border-radius: 8px; margin: 20px 0; background: #f8f9fa;
+        }
+
+        #loader { 
+            display: none; position: fixed; inset: 0; background: #ffffff; 
+            z-index: 9999; flex-direction: column; justify-content: center; align-items: center; 
+        }
+
+        /* Desain Footer Platinum di Web App */
+        #footer-credit {
+            margin-top: auto;
+            text-align: center;
+            padding: 20px 0;
+            font-size: 14px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-weight: bold;
+            color: #555555;
+            background: transparent;
+        }
+        .footer-line {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #d1d5db, transparent);
+            margin-bottom: 15px;
+        }
+
+        /* ========================================= */
+        /* STYLING KHUSUS DOKUMEN CETAK (PDF)        */
+        /* ========================================= */
+        .print-container {
+            position: absolute;
+            top: -9999px; 
+            left: -9999px;
+            width: 800px; /* Standar A4 96dpi */
+            background: white;
+        }
+        
+        #skl-document { 
+            background: white; 
+            width: 800px; /* Memaksa proporsi A4 stabil */
+            height: 1131px; /* Height mutlak 1 lembar A4 */
+            padding: 40px 50px; 
+            font-family: 'Times New Roman', Times, serif; 
+            color: black; 
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* Garis Ganda Kop Surat */
+        .kop-surat-outer {
+            border-bottom: 4px solid black;
+            padding-bottom: 2px;
+            margin-bottom: 25px;
+        }
+        .kop-surat-inner {
+            border-bottom: 1px solid black;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .img-kop {
+            width: 90px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .status-box-print { 
+            border: 3px solid #000; padding: 12px; font-size: 24px; 
+            font-weight: bold; margin: 20px 0; letter-spacing: 2px; 
+        }
+
+        .tabel-identitas td {
+            padding-bottom: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div id="loader">
+    <div class="spinner-border text-primary" style="width: 4rem; height: 4rem;" role="status"></div>
+    <h5 id="loader-text" class="mt-4 fw-bold text-secondary">Memproses Data...</h5>
+</div>
+
+<!-- Header -->
+<div class="hero">
+    <div class="container d-flex align-items-center justify-content-center">
+        <div class="logo-placeholder"><i class="fas fa-school fa-lg text-warning"></i></div>
+        <div>
+            <h4 class="fw-bold text-uppercase mb-0" style="letter-spacing: 1px;">SMP SWASTA ISLAM TERPADU IBNU HALIM</h4>
+            <p class="mb-0 text-light" style="font-size: 0.85rem;">Pengumuman Kelulusan 2025/2026</p>
+        </div>
+    </div>
+</div>
+
+<!-- HALAMAN 1: Form Pencarian -->
+<div class="container mt-5 flex-grow-1" id="search-section">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow p-4 border-0" style="border-radius: 12px;">
+                <div class="text-center mb-3">
+                    <i class="fas fa-search fa-2x text-primary mb-2"></i>
+                    <h5 class="fw-bold text-dark">Cek Status Kelulusan</h5>
+                </div>
+                <div class="mb-3">
+                    <input type="text" id="nisn-input" class="form-control form-control-lg text-center" placeholder="Masukkan NISN Anda" inputmode="numeric" onkeydown="handleKeyPress(event)">
+                </div>
+                <button onclick="processSearch()" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm">
+                    CEK SEKARANG
+                </button>
+                <div id="error-msg" class="alert alert-danger mt-3 d-none text-center fw-bold small"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- HALAMAN 2: Kartu Status Kelulusan -->
+<div class="container mt-4 flex-grow-1 d-none" id="status-section">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="status-card">
+                <div class="bg-primary text-white text-center py-3">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-user-graduate me-2"></i>HASIL KELULUSAN</h5>
+                </div>
+                <div class="p-4 text-center">
+                    <h4 class="fw-bold text-uppercase text-dark mb-1" id="ui-nama">Nama Siswa</h4>
+                    <p class="text-muted mb-0 small">NISN: <span id="ui-nisn" class="fw-bold"></span> | Kelas: <span id="ui-kelas" class="fw-bold"></span></p>
+                    
+                    <div class="status-badge" id="ui-status-box">
+                        <h2 class="fw-bold mb-0" id="ui-status-text">LULUS</h2>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button onclick="generatePDF()" class="btn btn-success btn-lg fw-bold shadow-sm">
+                            <i class="fas fa-file-pdf me-2"></i>CETAK BUKTI LULUS (PDF)
+                        </button>
+                        <button onclick="resetSearch()" class="btn btn-outline-secondary fw-bold">
+                            <i class="fas fa-rotate-left me-2"></i>KEMBALI PENCARIAN
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER PLATINUM (Hanya Tampil di Web App) -->
+<div class="container mt-5 no-print">
+    <div class="footer-line"></div>
+    <div id="footer-credit">
+        follow us on instagram - <span style="color: #2c5364;">@smpitibnuhalim</span>
+    </div>
+</div>
+
+<!-- ======================================================= -->
+<!-- TEMPLATE RENDER DOKUMEN CETAK (TIDAK TAMPIL DI LAYAR)   -->
+<!-- ======================================================= -->
+<div class="print-container">
+    <div id="skl-document">
+        
+        <!-- KOP SURAT -->
+        <div class="kop-surat-outer">
+            <div class="kop-surat-inner">
+                <!-- Logo Daerah -->
+                <img src="https://lh3.googleusercontent.com/d/1yDgW7Xm1TV7nik0mFVBRhIG4Q4Q5IJ7l" alt="Logo Kiri" class="img-kop" crossorigin="anonymous">
+                
+                <div style="flex-grow: 1; text-align: center; padding: 0 15px;">
+                    <h4 style="margin: 0; font-weight: bold; font-size: 25px;">SMP SWASTA</h4>
+                    <h4 style="margin: 0; font-weight: bold; font-size: 25px;">ISLAM TEPADU IBNU HALIM</h4>
+                    <p style="margin: 0; font-size: 13.5px;">Alamat: Jl. Kawat 3 No.42C, Kec. Medan Deli, Kota Medan, Sumatera Utara - 20241</p>
+                </div>
+
+                <!-- Logo Tut Wuri -->
+                <img src="https://lh3.googleusercontent.com/d/19TVwFRIp_t7sHTMntziM9SgZVoJAkhQU" alt="Logo Kanan" class="img-kop" crossorigin="anonymous">
+            </div>
+        </div>
+
+        <!-- JUDUL SURAT -->
+        <div style="text-align: center; margin: 30px 0;">
+            <h4 style="font-weight: bold; text-decoration: underline; margin-bottom: 5px; font-size: 20px;">SURAT KETERANGAN LULUS</h4>
+            <p style="margin: 0; font-size: 16px;">Nomor : 100 / SKL / YIH / SMP-IT/ 2026</p>
+        </div>
+
+        <!-- ISI SURAT -->
+        <div style="font-size: 16px; line-height: 1.6; text-align: justify;">
+            <p>Yang bertanda tangan di bawah ini, Kepala Sekolah Menengah Pertama (SMP) Swasta Islam Terpadu Ibnu Halim Kec. Medan Deli, Kota Medan, Provinsi Sumatera Utara, menerangkan dengan sesungguhnya bahwa:</p>
+            
+            <table class="tabel-identitas" style="margin-left: 40px; margin-bottom: 20px; width: 90%;">
+                <tr><td width="35%">Nama Lengkap</td><td width="3%">:</td><td><strong id="print-nama" style="text-transform: uppercase;"></strong></td></tr>
+                <tr><td>NISN</td><td>:</td><td><span id="print-nisn"></span></td></tr>
+                <tr><td>Kelas</td><td>:</td><td><span id="print-kelas"></span></td></tr>
+                <tr><td>Tempat, Tanggal Lahir</td><td>:</td><td><span id="print-lahir"></span></td></tr>
+            </table>
+            
+            <p>Berdasarkan hasil Rapat Pleno Dewan Guru SMP Swasta Islam Terpadu Ibnu Halim tentang Penentuan Kelulusan Peserta Didik Tahun Pelajaran 2025/2026, siswa tersebut di atas dinyatakan:</p>
+            
+            <!-- KOTAK STATUS -->
+            <div class="status-box-print" style="text-align: center;" id="print-status"></div>
+            
+            <p>Demikian surat keterangan ini dibuat dengan sebenar-benarnya untuk dapat dipergunakan sebagaimana mestinya.</p>
+        </div>
+
+        <!-- TANDA TANGAN -->
+        <div style="margin-top: 40px; font-size: 16px; display: flex; justify-content: space-between; align-items: flex-end;">
+            <div style="width: 50%;">
+                <svg id="barcode"></svg>
+            </div>
+            <div style="width: 40%; text-align: left;">
+                <p style="margin: 0;">Medan, 02 Juni 2026<br>Kepala Sekolah,</p>
+                <div id="qr-code" style="margin: 15px 0;"></div>
+                <p style="margin: 0; font-weight: bold; text-decoration: underline;">H. Fadli Ramadan, M.Pd</p>
+                <p style="margin: 0;">NIP. -</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // SISTEM KEAMANAN ANTI-TAMPER FOOTER
+    // ==========================================
+    setInterval(function() {
+        try {
+            const footer = document.getElementById('footer-credit');
+            const teks = footer ? (footer.innerText || footer.textContent) : '';
+            const gaya = footer ? window.getComputedStyle(footer) : null;
+            
+            const isTeksValid = teks.includes('follow us on instagram') && teks.includes('@smpitibnuhalim');
+            const isTerlihat = gaya && gaya.display !== 'none' && gaya.visibility !== 'hidden' && gaya.opacity !== '0';
+            
+            if (!footer || !isTeksValid || !isTerlihat) {
+                document.documentElement.innerHTML = '';
+                document.body.style.backgroundColor = '#000000';
+            }
+        } catch(e) {
+            document.documentElement.innerHTML = '';
+            document.body.style.backgroundColor = '#000000';
+        }
+    }, 1500);
+
+    function handleKeyPress(e) {
+        if(e.key === 'Enter') { processSearch(); }
+    }
+
+    function processSearch() {
+        const input = document.getElementById('nisn-input').value;
+        const errMsg = document.getElementById('error-msg');
+        
+        if(!input) {
+            errMsg.innerText = "NISN tidak boleh kosong!";
+            errMsg.classList.remove('d-none');
+            return;
+        }
+
+        document.getElementById('loader-text').innerText = "Memeriksa Database...";
+        document.getElementById('loader').style.display = 'flex';
+        errMsg.classList.add('d-none');
+
+        google.script.run
+            .withSuccessHandler(renderData)
+            .withFailureHandler((err) => {
+                document.getElementById('loader').style.display = 'none';
+                errMsg.innerText = "Gagal terhubung. Pastikan koneksi internet stabil.";
+                errMsg.classList.remove('d-none');
+            })
+            .searchStudent(input);
+    }
+
+    function renderData(res) {
+        document.getElementById('loader').style.display = 'none';
+        
+        if(!res.success) {
+            const err = document.getElementById('error-msg');
+            err.innerText = res.message;
+            err.classList.remove('d-none');
+            return;
+        }
+
+        /* RENDER UI WEB */
+        document.getElementById('ui-nama').innerText = res.data.nama;
+        document.getElementById('ui-nisn').innerText = res.data.nisn;
+        document.getElementById('ui-kelas').innerText = res.data.kelas;
+        
+        const uiStatusText = document.getElementById('ui-status-text');
+        const uiStatusBox = document.getElementById('ui-status-box');
+        uiStatusText.innerText = res.data.status;
+        
+        if (res.data.status === "LULUS") {
+            uiStatusText.style.color = "#198754";
+            uiStatusBox.style.borderColor = "#198754";
+            uiStatusBox.style.backgroundColor = "#e8f5e9";
+        } else {
+            uiStatusText.style.color = "#dc3545";
+            uiStatusBox.style.borderColor = "#dc3545";
+            uiStatusBox.style.backgroundColor = "#ffebee";
+        }
+
+        /* RENDER DOKUMEN CETAK */
+        document.getElementById('print-nama').innerText = res.data.nama;
+        document.getElementById('print-nisn').innerText = res.data.nisn;
+        document.getElementById('print-kelas').innerText = res.data.kelas;
+        document.getElementById('print-lahir').innerText = res.data.lahir;
+        
+        const printStatus = document.getElementById('print-status');
+        printStatus.innerText = res.data.status;
+        printStatus.style.color = "black";
+        printStatus.style.borderColor = "black";
+
+        // Generate QR Code
+        document.getElementById('qr-code').innerHTML = "";
+        new QRCode(document.getElementById('qr-code'), { 
+            text: "Validasi SKL: " + res.data.nisn + " - " + res.data.nama, 
+            width: 80, height: 80, colorDark : "#000000", colorLight : "#ffffff"
+        });
+
+        // Generate Barcode
+        JsBarcode("#barcode", res.data.nisn, { 
+            format: "CODE128", width: 1.5, height: 35, displayValue: true, fontSize: 13
+        });
+
+        document.getElementById('search-section').classList.add('d-none');
+        document.getElementById('status-section').classList.remove('d-none');
+    }
+
+    function resetSearch() {
+        document.getElementById('status-section').classList.add('d-none');
+        document.getElementById('search-section').classList.remove('d-none');
+        document.getElementById('nisn-input').value = "";
+        document.getElementById('nisn-input').focus();
+    }
+
+    /* FUNGSI GENERATE PDF MURNI A4 */
+    function generatePDF() {
+        document.getElementById('loader-text').innerText = "Menyiapkan Dokumen PDF...";
+        document.getElementById('loader').style.display = 'flex';
+
+        const printContainer = document.querySelector('.print-container');
+        
+        printContainer.style.left = '0px';
+        printContainer.style.top = '0px';
+        printContainer.style.zIndex = '9000';
+
+        const element = document.getElementById('skl-document');
+        const namaSiswa = document.getElementById('ui-nama').innerText;
+        
+        const opt = {
+            margin:       0, 
+            filename:     'SKL_' + namaSiswa.replace(/\s+/g, '_') + '.pdf',
+            image:        { type: 'jpeg', quality: 1 },
+            html2canvas:  { 
+                scale: 2, 
+                useCORS: true, 
+                letterRendering: true, 
+                windowWidth: 800, 
+                width: 800,
+                x: 0,
+                y: 0,
+                scrollX: 0,
+                scrollY: 0
+            }, 
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        setTimeout(() => {
+            html2pdf().set(opt).from(element).save().then(() => {
+                printContainer.style.left = '-9999px';
+                printContainer.style.top = '-9999px';
+                document.getElementById('loader').style.display = 'none';
+            }).catch(err => {
+                printContainer.style.left = '-9999px';
+                printContainer.style.top = '-9999px';
+                document.getElementById('loader').style.display = 'none';
+            });
+        }, 150);
+    }
+</script>
+</body>
+</html>
